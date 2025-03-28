@@ -12,7 +12,9 @@ class DataTablePage extends StatefulWidget {
 class _DataTablePageState extends State<DataTablePage> {
   late List<PlutoColumn> columns;
   late List<PlutoRow> rows;
-  
+  late PlutoGridStateManager
+      stateManager; // Para manejar el estado de PlutoGrid
+  final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -131,7 +133,7 @@ class _DataTablePageState extends State<DataTablePage> {
       ),
     ];
 
-    // Define rows from datos.dart
+    // Define rows de datos.dart
     rows = DatosTabla.filas.map((fila) {
       return PlutoRow(
         cells: {
@@ -154,62 +156,73 @@ class _DataTablePageState extends State<DataTablePage> {
     }).toList();
   }
 
+  //BUSQUEDA
+  void filterRows(String searchTerm) {
+    stateManager.setFilter((row) {
+      return row.cells.values.any((cell) => cell.value
+          .toString()
+          .toLowerCase()
+          .contains(searchTerm.toLowerCase()));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Tabla de datos'),
+        backgroundColor: Colors.white,
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  'Buscar:', // Etiqueta del TextField
+                  'Buscar datos:', // Etiqueta del TextField
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
+              //BUSCAR
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: TextField(
+                    controller: searchController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: 'Ingrese un término de búsqueda',
+                      hintText: 'Ingrese datos de búsqueda',
                     ),
                     onChanged: (value) {
-                      // Lógica para manejar el texto ingresado
-                      print('Texto ingresado: $value');
+                      filterRows(value); // Filtrar automáticamente al escribir
                     },
                   ),
                 ),
               ),
+              
             ],
           ),
-          const SizedBox(
-              height: 16), // Espaciado entre el TextField y el PlutoGrid
-          Expanded(
+          const SizedBox(               height: 16), // Espaciado entre el TextField y el PlutoGrid
+          Flexible(
             child: PlutoGrid(
               columns: columns,
               rows: rows,
-              onChanged: (PlutoGridOnChangedEvent event) {
-                print(event);
+              onLoaded: (PlutoGridOnLoadedEvent event) {
+                stateManager = event.stateManager;  
               },
               configuration: PlutoGridConfiguration(
                 scrollbar: PlutoGridScrollbarConfig(
                   isAlwaysShown: true,
                   scrollbarThickness: 8,
                 ),
-                columnFilter: PlutoGridColumnFilterConfig(
-                  filters: [],
-                ),
               ),
             ),
           ),
-        ],
+             Text('data', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+         ],
       ),
     );
   }

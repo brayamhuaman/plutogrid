@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'tabla.dart';
+import 'package:trabajopluto/flotas.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const DataTablePage(),
+      home:   FlotasPage (),
     );
   }
 }
